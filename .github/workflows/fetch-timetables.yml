@@ -55,6 +55,7 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
+          git add -N sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm
           git diff --quiet sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push if changed
