@@ -1,0 +1,5 @@
+<!-- filter code below -->
+<meta charset="UTF-8">
+<script type="text/javascript" src="filter-all.js"></script>
+<script type="text/javascript" src="html2canvas.min.js"></script>
+<!-- filter code above -->

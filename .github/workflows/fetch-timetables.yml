@@ -1,0 +1,67 @@
+name: Fetch and Update Timetables
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  fetch-timetables:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read filter code
+        id: filter-code
+        run: |
+          FILTER_CODE=$(cat code-to-insert-to-head-of-official-timetable.txt)
+          echo "filter_code<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILTER_CODE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Fetch and process MSc(CS) Semester 1
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/msccs-sem1.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem1filter.htm
+          rm temp.htm
+
+      - name: Fetch and process MSc(ECIC) Semester 1
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/mscecic-sem1.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem1ecicfilter.htm
+          rm temp.htm
+
+      - name: Fetch and process MSc(CS) Semester 2 (HK)
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/msccs-sem2.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem2hkfilter.htm
+          rm temp.htm
+
+      - name: Fetch and process MSc(ECIC) Semester 2 (HK)
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/mscecic-sem2.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem2hkecicfilter.htm
+          rm temp.htm
+
+      - name: Fetch and process MSc(CS/ECIC) Semester 2 (SH)
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/deltax-sem2.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem2shfilter.htm
+          rm temp.htm
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm
+          git commit -m "Update timetables - $(date +'%Y-%m-%d')"
+          git push
