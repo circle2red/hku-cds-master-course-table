@@ -6,17 +6,19 @@ const special = ['Exam', 'University Holiday', 'Holiday', 'Tech Immersion Week']
 // Detect page type from URL
 function detectPageType() {
     const url = window.location.href.toLowerCase();
-
+    
     if (url.includes('sem2hkecic')) {
         return 'sem2hkecic';
     } else if (url.includes('sem2hk')) {
         return 'sem2hk';
     } else if (url.includes('sem2sh')) {
         return 'sem2sh';
+    } else if (url.includes('sem1ecic')) {
+        return 'sem1ecic';
     } else if (url.includes('sem1')) {
         return 'sem1';
     }
-
+    
     // Default fallback
     return 'sem1';
 }
