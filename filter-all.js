@@ -68,6 +68,14 @@ function isBlank(str) {
   return /^\s*$/.test(str);
 }
 
+function cleanText(str) {
+  // Remove � (Unicode replacement character U+FFFD)
+  // Remove <span style='mso-spacerun:yes'>?/span> pattern
+  return str.replace(/�/g, '')
+            .replace(/<span\s+style='mso-spacerun:yes'>\?\/span>/gi, '')
+            .trim();
+}
+
 function extractCoursesFromTable(config) {
     const courses = [];
 
@@ -233,6 +241,15 @@ function updateURL(selectedCourses, filterApplied) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Clean all text content in the document first
+    document.querySelectorAll('*').forEach(element => {
+        element.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.textContent = cleanText(node.textContent);
+            }
+        });
+    });
+
     // Detect page type and get corresponding config
     const pageType = detectPageType();
     const config = pageConfigs[pageType];
