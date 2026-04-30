@@ -54,17 +54,29 @@ jobs:
           sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem2shfilter.htm
           rm temp.htm
 
+      - name: Fetch and process MSc(CS) Semester 3
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/msccs-sem3.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem3filter.htm
+          rm temp.htm
+
+      - name: Fetch and process MSc(ECIC) Semester 3
+        run: |
+          curl -s https://tpg.cds.hku.hk/courses/timetable/mscecic-sem3.htm -o temp.htm
+          sed "/<head>/r code-to-insert-to-head-of-official-timetable.txt" temp.htm > sem3ecicfilter.htm
+          rm temp.htm
+
       - name: Check for changes
         id: git-check
         run: |
-          git add -N sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm
-          git diff --quiet sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm || echo "changed=true" >> $GITHUB_OUTPUT
+          git add -N sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm sem3filter.htm sem3ecicfilter.htm
+          git diff --quiet sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm sem3filter.htm sem3ecicfilter.htm || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push if changed
         if: steps.git-check.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm
+          git add sem1filter.htm sem1ecicfilter.htm sem2hkfilter.htm sem2hkecicfilter.htm sem2shfilter.htm sem3filter.htm sem3ecicfilter.htm
           git commit -m "Update timetables - $(date +'%Y-%m-%d')"
           git push

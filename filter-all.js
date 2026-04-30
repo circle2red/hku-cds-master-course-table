@@ -7,7 +7,11 @@ const special = ['Exam', 'University Holiday', 'Holiday', 'Tech Immersion Week']
 function detectPageType() {
     const url = window.location.href.toLowerCase();
     
-    if (url.includes('sem2hkecic')) {
+    if (url.includes('sem3ecic')){
+        return 'sem3ecic';
+    } else if (url.includes('sem3')){
+        return 'sem3';
+    } else if (url.includes('sem2hkecic')) {
         return 'sem2hkecic';
     } else if (url.includes('sem2hk')) {
         return 'sem2hk';
@@ -29,7 +33,7 @@ const pageConfigs = {
         headerClass: 'xl8925285',
         headerText: 'Code',
         lastUpdatedIndex: 2,
-        titleSuffix: '',
+        titleSuffix: ' (Sem 1)',
         courseCodeFix: null
     },
     'sem1ecic': {
@@ -61,6 +65,20 @@ const pageConfigs = {
         titleSuffix: ' (Sem2, HK ECIC)',
         courseCodeFix: null,
         preserveLocationCells: true  // Special flag for ECIC two-row layout
+    },
+    'sem3': {
+        headerClass: 'xl6330258',
+        headerText: 'Course Code',
+        lastUpdatedIndex: 3,
+        titleSuffix: ' (Sem 3)',
+        courseCodeFix: null
+    },
+    'sem3ecic': {
+        headerClass: 'xl7426745',
+        headerText: 'Course Code',
+        lastUpdatedIndex: 3,
+        titleSuffix: ' (Sem3, ECIC)',
+        courseCodeFix: null
     }
 };
 
@@ -72,7 +90,7 @@ function cleanText(str) {
   // Remove � (Unicode replacement character U+FFFD)
   // Remove <span style='mso-spacerun:yes'>?/span> pattern
   return str.replace(/�/g, '')
-            .replace(/<span\s+style='mso-spacerun:yes'>\?\/span>/gi, '')
+            .replace(/<span\s+style='mso-spacerun:yes'>\?<*\/span>/gi, '')
             .trim();
 }
 
@@ -267,9 +285,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let newDiv = document.createElement("div");
     newDiv.style.cssText = 'margin: 20px; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;';
 
+    let titleRow = document.createElement("div");
+    titleRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 12px;';
+
     let title = document.createElement("h3");
     title.textContent = "课程过滤器 / Course Filter" + config.titleSuffix + " " + lastUpdated;
-    title.style.cssText = 'margin-top: 0; color: #333;';
+    title.style.cssText = 'margin: 0; color: #333;';
+
+    let homeLink = document.createElement("a");
+    homeLink.href = "/";
+    homeLink.textContent = "返回主页 / Home";
+    homeLink.style.cssText = 'color: #007cba; text-decoration: none; white-space: nowrap;';
+
+    titleRow.appendChild(title);
+    titleRow.appendChild(homeLink);
 
     let instruction = document.createElement("p");
     instruction.textContent = "选择你想查看的课程，然后点击过滤按钮：";
@@ -430,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Assemble the interface
-    newDiv.appendChild(title);
+    newDiv.appendChild(titleRow);
     newDiv.appendChild(instruction);
 
     let controlsDiv = document.createElement("div");
