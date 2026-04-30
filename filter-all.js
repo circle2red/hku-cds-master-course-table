@@ -69,7 +69,7 @@ const pageConfigs = {
     'sem3': {
         headerClass: 'xl6330258',
         headerText: 'Course Code',
-        lastUpdatedIndex: 3,
+        lastUpdatedIndex: 6,
         titleSuffix: ' (Sem 3)',
         courseCodeFix: null
     },
